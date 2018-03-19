@@ -1,25 +1,26 @@
 package com.brontoo.ui;
 
 import android.app.Activity;
-import android.app.Application;
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.os.Handler;
-
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.GridLayoutManager;
-
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -30,6 +31,7 @@ import com.brontoo.R;
 import com.brontoo.adapters.MovieRecyclerAdapter;
 import com.brontoo.common.AppConstant;
 import com.brontoo.common.CommonMethod;
+import com.brontoo.interfaces.GridListener;
 import com.brontoo.models.Movie;
 
 import org.json.JSONArray;
@@ -37,7 +39,6 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class MovieListActivity extends Activity {
@@ -47,6 +48,7 @@ public class MovieListActivity extends Activity {
     private Handler mHandler=new Handler();
     private RecyclerView recyclerView;
     private DrawerLayout drawerLayout;
+    boolean doubleBackToExitPressedOnce = false;
 
 
 
@@ -226,6 +228,17 @@ public class MovieListActivity extends Activity {
             GridLayoutManager manager = new GridLayoutManager(this, CommonMethod.calculateNoOfColumns(getBaseContext()), GridLayoutManager.VERTICAL, false);
             recyclerView.setAdapter(movieRecyclerAdapter);
             recyclerView.setLayoutManager(manager);
+            movieRecyclerAdapter.setListener(new GridListener() {
+                @Override
+                public void onItemListener(Movie movie) {
+                    Toast.makeText(MovieListActivity.this, "item clicked", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onMoreListener(Movie movie,View view) {
+                    showPopup(view);
+                }
+            });
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
         }
@@ -497,11 +510,67 @@ public class MovieListActivity extends Activity {
                 closeDrawerMenu();
                 return;
             }
+            if(findViewById(R.id.search_container).getVisibility()==View.VISIBLE){
+                hideSearchContainer();
+                return;
+            }
+            if (doubleBackToExitPressedOnce) {
+                this.finishAffinity();
+            }
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, getString(R.string.exit_app_text), Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce=false;
+                }
+            }, 2000);
+
 
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
         }
-        super.onBackPressed();
 
+
+    }
+    private PopupWindow morePopUpWindow;
+    public void showPopup(View v) {
+        LinearLayout favourite,watchList;
+        ImageView favouriteImage,watchListImage;
+        TextView favouriteText,watchListText;
+
+        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View popupView = layoutInflater.inflate(R.layout.more_popup_layout, null);
+        morePopUpWindow = new PopupWindow(popupView, CommonMethod.dpToPx(getBaseContext(),200),
+                CommonMethod.dpToPx(getBaseContext(),81));
+        morePopUpWindow.setOutsideTouchable(true);
+        morePopUpWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        morePopUpWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+
+            }
+        });
+        favouriteText=(TextView)popupView.findViewById(R.id.favourite_more_text);
+        CommonMethod.setFontMedium(favouriteText);
+        watchListText=(TextView)popupView.findViewById(R.id.watchList_text);
+        CommonMethod.setFontMedium(watchListText);
+        favouriteImage=(ImageView)popupView.findViewById(R.id.favourite_image);
+        watchListImage=(ImageView)popupView.findViewById(R.id.watchlist_image);
+        favourite=(LinearLayout)popupView.findViewById(R.id.favourite_container);
+        favourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        watchList=(LinearLayout)popupView.findViewById(R.id.watchList);
+        watchList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        morePopUpWindow.showAsDropDown(v);
     }
 }

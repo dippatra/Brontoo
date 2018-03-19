@@ -290,7 +290,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_watch" />
+                android:src="@drawable/ic_playlist_add" />
 
             <TextView
                 android:id="@+id/watchList_text"

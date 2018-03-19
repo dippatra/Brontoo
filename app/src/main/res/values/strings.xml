@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BrontooMovieTask</string>
     <string name="splash_text">BRONTOO</string>
-    <string name="no_internet_message">seem like you do not any internet connection.Would you like to continue?</string>
+    <string name="no_internet_message">seem like you do not have any internet connection.Please check your internet connection</string>
     <string name="continue_text">continue</string>
     <string name="exit_text">exit</string>
     <string name="movie_list_header_text">Movies</string>
@@ -15,6 +15,11 @@
     <string name="watchList_text">WatchList</string>
     <string name="options">options</string>
     <string name="wip_message">work in progress</string>
+    <string name="exit_app_text">double tab to exit</string>
+    <string name="add_favourite">Add to Favourite</string>
+    <string name="add_watchList">Add to WatchList</string>
+    <string name="remove_favourite">Remove from Favourite</string>
+    <string name="remove_watchList">Remove from WatchList</string>
 
 
 </resources>

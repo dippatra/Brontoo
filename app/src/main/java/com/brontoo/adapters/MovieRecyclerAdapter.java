@@ -1,22 +1,21 @@
 package com.brontoo.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.brontoo.R;
 import com.brontoo.common.AppConstant;
 import com.brontoo.common.CommonMethod;
+import com.brontoo.interfaces.GridListener;
 import com.brontoo.models.Movie;
 import com.bumptech.glide.Glide;
-
 
 import java.util.ArrayList;
 
@@ -25,11 +24,15 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     private static final String TAG="RecyclerAdapter";
     private ArrayList<Movie>movieList;
     private Context context;
+    private GridListener listener;
 
 
     public MovieRecyclerAdapter(Context context,ArrayList<Movie>movieList){
         this.context=context;
         this.movieList=movieList;
+    }
+    public void setListener(GridListener listener){
+        this.listener=listener;
     }
 
     @Override
@@ -44,28 +47,9 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         Movie movie;
         try{
             movie = movieList.get(position);
+            holder.setData(movie);
             imageUrl = AppConstant.IMAGE_BASE_URL + movie.getPosterImagePath();
             holder.movieImage.setImageDrawable (null);
-            /*Glide
-                    .with(context)
-                    .load(imageUrl)
-                    .into(new BaseTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
-                            holder.movieImage.setBackground(resource);
-                        }
-
-                        @Override
-                        public void getSize(SizeReadyCallback cb) {
-                            cb.onSizeReady(250, 250);
-
-                        }
-
-                        @Override
-                        public void removeCallback(SizeReadyCallback cb) {
-
-                        }
-                    });*/
             Glide.with(context).asBitmap().load(imageUrl).into(holder.movieImage);
             holder.headerText.setText(movie.getTitle());
             holder.detailText.setText(CommonMethod.getFullFormLanguage(movie.getLanguage()) + ", " +
@@ -82,9 +66,12 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
         return movieList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView movieImage,more;
         TextView headerText,detailText;
+        private Movie movie;
+        LinearLayout textContainer;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -93,7 +80,30 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
             headerText=(TextView)itemView.findViewById(R.id.movie_header);
             headerText.setSelected(true);
             detailText=(TextView)itemView.findViewById(R.id.movie_detail);
+            textContainer=(LinearLayout)itemView.findViewById(R.id.text_container);
+            textContainer.setOnClickListener(this);
             detailText.setSelected(true);
+            movieImage.setOnClickListener(this);
+            more.setOnClickListener(this);
+            headerText.setOnClickListener(this);
+            detailText.setOnClickListener(this);
+        }
+        public void setData(Movie movie){
+            this.movie=movie;
+
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(view.getId()==R.id.more){
+                if(listener!=null){
+                    listener.onMoreListener(movie,view);
+                }
+            }else {
+                if(listener!=null){
+                    listener.onItemListener(movie);
+                }
+            }
         }
     }
 

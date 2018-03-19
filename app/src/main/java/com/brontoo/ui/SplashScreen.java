@@ -3,9 +3,8 @@ package com.brontoo.ui;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -22,7 +21,6 @@ import com.brontoo.R;
 import com.brontoo.common.AppConstant;
 import com.brontoo.common.CommonMethod;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class SplashScreen extends Activity {
@@ -128,17 +126,7 @@ public class SplashScreen extends Activity {
         try{
             AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.MyDialogStyle);
             builder.setMessage(getString(R.string.no_internet_message));
-            builder.setCancelable(true);
-
-           /* builder.setPositiveButton(
-                    getString(R.string.continue_text),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            openMovieLisScreen();
-                        }
-                    });*/
-
+            builder.setCancelable(false);
             builder.setNegativeButton(
                     getString(R.string.exit_text),
                     new DialogInterface.OnClickListener() {

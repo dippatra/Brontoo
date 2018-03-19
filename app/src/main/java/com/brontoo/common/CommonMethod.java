@@ -2,6 +2,7 @@ package com.brontoo.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
@@ -9,10 +10,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
+import com.brontoo.controllers.Typefaces;
 import com.brontoo.models.Movie;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -213,5 +217,197 @@ public class CommonMethod {
         }
         return movies;
     }
+    public static void setFontLight(TextView textView) {
+        try {
+
+            Typeface typeface = Typefaces.get(textView.getContext(), "fonts/Roboto-Thin.ttf");
+            textView.setTypeface(typeface);
+        } catch (Exception e) {
+            e.toString();
+        }
+    }
+    public static void setFontBold(TextView textView) {
+        try {
+
+            Typeface typeface = Typefaces.get(textView.getContext(), "fonts/Roboto-Regular.ttf");
+            textView.setTypeface(typeface);
+        } catch (Exception e) {
+            e.toString();
+        }
+    }
+    public static void setFontMedium(TextView textView) {
+        try {
+            Typeface typeface = Typefaces.get(textView.getContext(), "fonts/Roboto-Light.ttf");
+            textView.setTypeface(typeface);
+        } catch (Exception e) {
+            e.toString();
+        }
+    }
+    public static int dpToPx(Context context, int dp) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+    public static JSONObject getMovieJsonObject(Context context,int id){
+        JSONArray movieArray;
+        JSONObject object;
+        try{
+            object=new JSONObject(CommonMethod.getMovieList(context));
+            if(object!=null){
+                movieArray=object.getJSONArray("movies");
+                if(movieArray!=null&&movieArray.length()>0){
+                    for (int count=0;count<movieArray.length();count++){
+                        if(movieArray.getJSONObject(count).getInt("id")==id){
+                            return movieArray.getJSONObject(count);
+                        }
+                    }
+                }
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return null;
+    }
+    public static void saveFavouriteMovieList(Context context,String movieList){
+        try{
+            savePreferences(context,"saveFavouriteMovieList",movieList);
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+
+    }
+    public static String getFavouriteMovieList(Context context){
+        Object data;
+        try{
+            data=getPreferences(context,"saveFavouriteMovieList",PREFTYPE_STRING);
+            if(data!=null){
+                return String.valueOf(data);
+            }
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return "";
+
+    }
+    public static void saveWatchMovieList(Context context,String movieList){
+        try{
+            savePreferences(context,"saveWatchMovieList",movieList);
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+
+    }
+    public static String getWatchMovieList(Context context){
+        Object data;
+        try{
+            data=getPreferences(context,"saveWatchMovieList",PREFTYPE_STRING);
+            if(data!=null){
+                return String.valueOf(data);
+            }
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return "";
+
+    }
+    public static boolean isMovieInWatchList(Context context,int id){
+        String watchList;
+        JSONArray watchListArray;
+        try{
+            watchList=getWatchMovieList(context);
+            if(!watchList.equalsIgnoreCase("")){
+                watchListArray=new JSONArray(watchList);
+                if(watchListArray!=null&&watchListArray.length()>0){
+                    for(int count=0;count<watchListArray.length();count++){
+                        if(watchListArray.getJSONObject(count).getInt("id")==id){
+                            return true;
+                        }
+
+                    }
+                }
+
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return false;
+    }
+    public static boolean isMovieInFavouriteList(Context context,int id){
+        String favList;
+        JSONArray favListArray;
+        try{
+            favList=getFavouriteMovieList(context);
+            if(!favList.equalsIgnoreCase("")){
+                favListArray=new JSONArray(favList);
+                if(favListArray!=null&&favListArray.length()>0){
+                    for(int count=0;count<favListArray.length();count++){
+                        if(favListArray.getJSONObject(count).getInt("id")==id){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return false;
+    }
+    public static  void saveToWatchList(Context context,int id){
+        String watchList;
+        JSONArray watchListArray;
+        JSONObject object;
+        try{
+            watchList=getWatchMovieList(context);
+            if(!watchList.equalsIgnoreCase("")){
+                watchListArray=new JSONArray(watchList);
+                object=getMovieJsonObject(context,id);
+                watchListArray.put(object);
+                saveWatchMovieList(context,watchListArray.toString());
+            }else {
+                watchListArray=new JSONArray();
+                object=getMovieJsonObject(context,id);
+                watchListArray.put(object);
+                saveWatchMovieList(context,watchListArray.toString());
+
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+    }
+    public static  void saveToFavouriteList(Context context,int id){
+        String favList;
+        JSONArray favListArray;
+        JSONObject object;
+        try{
+            favList=getFavouriteMovieList(context);
+            if(!favList.equalsIgnoreCase("")){
+                favListArray=new JSONArray(favList);
+                object=getMovieJsonObject(context,id);
+                favListArray.put(object);
+                saveFavouriteMovieList(context,favListArray.toString());
+            }else {
+                favListArray=new JSONArray();
+                object=getMovieJsonObject(context,id);
+                favListArray.put(object);
+                saveFavouriteMovieList(context,favListArray.toString());
+
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+    }
+    public static void removeFromWatchList(Context context,int id){
+        try{
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+    }
+
 
 }
