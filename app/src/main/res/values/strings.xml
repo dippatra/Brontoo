@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">BrontooMovieTask</string>
+    <string name="splash_text">BRONTOO</string>
+    <string name="no_internet_message">seem like you do not any internet connection.Would you like to continue?</string>
+    <string name="continue_text">continue</string>
+    <string name="exit_text">exit</string>
+    <string name="movie_list_header_text">Movies</string>
+    <string name="search_hint">Search movie</string>
+    <string name="no_search_Text">No search result found</string>
+    <string name="sort_text">Sort</string>
+    <string name="sort_by_popularity_text">By Popularity</string>
+    <string name="sort_by_date_text">By Date</string>
+    <string name="sort_by_name_text">By Name</string>
+    <string name="favorite_text">Favourites</string>
+    <string name="watchList_text">WatchList</string>
+    <string name="options">options</string>
+    <string name="wip_message">work in progress</string>
+
+
+</resources>
