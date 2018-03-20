@@ -190,11 +190,11 @@ public class MovieListActivity extends Activity implements GridListener{
                             movieObject.setPopularity(BigDecimal.valueOf(object.getDouble("popularity")).floatValue());
                             movieObject.setPosterImagePath(object.getString("poster_path"));
                             movieObject.setLanguage(object.getString("original_language"));
-                            genreArray=object.getJSONArray("genre_ids");
+                            /*genreArray=object.getJSONArray("genre_ids");
                             for(int innerCount=0;innerCount<genreArray.length();innerCount++){
                                 genreIDs.add(genreArray.getInt(innerCount));
                             }
-                            movieObject.setGenreIds(genreIDs);
+                            movieObject.setGenreIds(genreIDs);*/
                             movieObject.setBackDropPath(object.getString("backdrop_path"));
                             movieObject.setForAdult(object.getBoolean("adult"));
                             movieObject.setSummary(object.getString("overview"));
@@ -428,6 +428,7 @@ public class MovieListActivity extends Activity implements GridListener{
                 public void onClick(View view) {
                     //Toast.makeText(MovieListActivity.this, getString(R.string.wip_message), Toast.LENGTH_SHORT).show();
                     if(!isFavouriteListEmpty()){
+                        closeDrawerMenu();
                         openFavouriteLisScreen();
                     }else {
                         Toast.makeText(MovieListActivity.this, getString(R.string.empty_favouriteList), Toast.LENGTH_SHORT).show();
@@ -440,6 +441,7 @@ public class MovieListActivity extends Activity implements GridListener{
                 @Override
                 public void onClick(View view) {
                     if(!isWatchListEmpty()){
+                        closeDrawerMenu();
                         openWatchLisScreen();
                     }else {
                         Toast.makeText(MovieListActivity.this, getString(R.string.empty_watchList), Toast.LENGTH_SHORT).show();
@@ -459,12 +461,15 @@ public class MovieListActivity extends Activity implements GridListener{
                 public void onCheckedChanged(RadioGroup radioGroup, @IdRes int checkedId) {
                     try{
                         if(checkedId==R.id.sortByPopuLarityRadio){
+                            closeDrawerMenu();
                             AppConstant.sortedMechanism=1;
                             sortTask();
                         }else if(checkedId==R.id.sortByDate){
+                            closeDrawerMenu();
                             AppConstant.sortedMechanism=2;
                             sortTask();
                         }else if(checkedId==R.id.sortByNameRadio){
+                            closeDrawerMenu();
                             AppConstant.sortedMechanism=3;
                             sortTask();
                         }
@@ -626,10 +631,11 @@ public class MovieListActivity extends Activity implements GridListener{
     @Override
     public void onItemListener(Movie movie) {
         try{
-            if(morePopUpWindow.isShowing()){
+            if(morePopUpWindow!=null&&morePopUpWindow.isShowing()){
                 morePopUpWindow.dismiss();
                 return;
             }
+            openDetailScreen(movie);
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
         }
@@ -659,6 +665,17 @@ public class MovieListActivity extends Activity implements GridListener{
         Intent intent;
         try {
             intent = new Intent(getApplicationContext(), WatchListActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.toString());
+        }
+    }
+    private void openDetailScreen(Movie movie) {
+        Intent intent;
+        try {
+            intent = new Intent(getApplicationContext(), MovieDetailScreen.class);
+            intent.putExtra("movie",movie);
             startActivity(intent);
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
         } catch (Exception ex) {

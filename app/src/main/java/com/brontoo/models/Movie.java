@@ -1,11 +1,12 @@
 package com.brontoo.models;
 
 
-import java.util.ArrayList;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 
 
-public class Movie {
+public class Movie implements Parcelable{
     private int voteCount;
     private int ID;
     private boolean isVideo;
@@ -14,19 +15,69 @@ public class Movie {
     private float popularity;
     private String posterImagePath;
     private String language;
-    private ArrayList<Integer> genreIds=new ArrayList<>();
     private String backDropPath;
     private boolean isForAdult;
     private String summary;
     private String releaseDate;
+    public Movie(){
+
+    }
+
+    protected Movie(Parcel in) {
+        voteCount = in.readInt();
+        ID = in.readInt();
+        isVideo = in.readByte() != 0;
+        voteAverage = in.readFloat();
+        title = in.readString();
+        popularity = in.readFloat();
+        posterImagePath = in.readString();
+        language = in.readString();
+        backDropPath = in.readString();
+        isForAdult = in.readByte() != 0;
+        summary = in.readString();
+        releaseDate = in.readString();
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(voteCount);
+        dest.writeInt(ID);
+        dest.writeByte((byte) (isVideo ? 1 : 0));
+        dest.writeFloat(voteAverage);
+        dest.writeString(title);
+        dest.writeFloat(popularity);
+        dest.writeString(posterImagePath);
+        dest.writeString(language);
+        dest.writeString(backDropPath);
+        dest.writeByte((byte) (isForAdult ? 1 : 0));
+        dest.writeString(summary);
+        dest.writeString(releaseDate);
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public int getVoteCount() {
         return voteCount;
     }
 
-    public ArrayList<Integer> getGenreIds() {
-        return genreIds;
-    }
+
 
     public boolean isForAdult() {
         return isForAdult;
@@ -80,9 +131,7 @@ public class Movie {
         isForAdult = forAdult;
     }
 
-    public void setGenreIds(ArrayList<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
+
 
     public void setID(int ID) {
         this.ID = ID;
