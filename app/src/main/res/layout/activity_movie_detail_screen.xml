@@ -17,6 +17,7 @@
             android:layout_alignParentLeft="true"
             android:layout_width="@dimen/header_height"
             android:padding="18dp"
+            android:background="?android:attr/selectableItemBackground"
             android:src="@drawable/ic_arrow_back_white"
             android:layout_height="@dimen/header_height" />
 
@@ -24,6 +25,10 @@
             android:id="@+id/header_Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/header_height"
+            android:paddingRight="@dimen/header_height"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:text="@string/favourite_header"
             android:textColor="@color/white"
             android:layout_centerInParent="true"
@@ -35,6 +40,7 @@
         android:id="@+id/scrollView"
         android:layout_below="@id/header_container"
         android:layout_width="match_parent"
+        android:background="@color/activity_bg"
         android:layout_height="match_parent">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -42,13 +48,15 @@
             <ImageView
                 android:id="@+id/posterImage"
                 android:layout_width="match_parent"
+                android:scaleType="centerCrop"
                 android:layout_height="200dp"/>
             <RelativeLayout
                 android:id="@+id/option_container"
                 android:layout_width="match_parent"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
+                android:layout_below="@+id/posterImage"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/title"
@@ -56,26 +64,33 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="14sp"
+                    android:singleLine="true"
+                    android:ellipsize="end"
                     android:layout_alignParentLeft="true"/>
                 <ImageView
-                    android:id="@+id/watchLiist"
+                    android:id="@+id/watchList"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_playlist_add"/>
+                    android:src="@drawable/ic_playlist_unmarked"/>
                 <ImageView
                     android:id="@+id/favourite"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
-                    android:layout_toEndOf="@+id/watchLiist"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_toLeftOf="@+id/watchList"
                     android:layout_marginRight="10dp"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_favorite"/>
+                    android:src="@drawable/ic_favorite_unmarkerd"/>
 
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/rating_container"
                 android:layout_width="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/option_container"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/year"
@@ -92,7 +107,7 @@
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     android:layout_toRightOf="@+id/year"
-                    android:layout_marginLeft="10dp"/>
+                    android:layout_marginLeft="25dp"/>
 
             </RelativeLayout>
             <TextView
@@ -101,17 +116,21 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/black"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:layout_below="@+id/rating_container"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="2dp"
                 />
             <TextView
                 android:id="@+id/summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:textColor="@color/black"
                 android:layout_below="@+id/language"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 />
         </RelativeLayout>
 

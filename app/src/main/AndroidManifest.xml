@@ -34,7 +34,9 @@
             android:name=".ui.WatchListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".ui.MovieDetailScreen">
+        <activity android:name=".ui.MovieDetailScreen"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

@@ -45,12 +45,16 @@ import java.util.ArrayList;
 
 public class MovieListActivity extends Activity implements GridListener{
     private static final String TAG="MovieListActivity";
+    private static final int DETAIL_CODE=101;
+    private static final int WATCHLIST_CODE=102;
+    private static final int FAVOURITE_CODE=103;
     private ArrayList<Movie>movieList=new ArrayList<>();
     private MovieRecyclerAdapter movieRecyclerAdapter;
     private Handler mHandler=new Handler();
     private RecyclerView recyclerView;
     private DrawerLayout drawerLayout;
-    boolean doubleBackToExitPressedOnce = false;
+    private boolean doubleBackToExitPressedOnce = false;
+    private EditText searchEditText;
 
 
 
@@ -68,7 +72,6 @@ public class MovieListActivity extends Activity implements GridListener{
     }
     private void initializeActivityControl(){
         ImageView menu,search,searchBack;
-        EditText searchEditText;
         TextView headerText;
         try{
             drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
@@ -117,6 +120,7 @@ public class MovieListActivity extends Activity implements GridListener{
             searchBack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    searchEditText.setText("");
                     hideSearchContainer();
                     hideNoSearchResultView();
                     updateRecycleView(movieList);
@@ -124,6 +128,7 @@ public class MovieListActivity extends Activity implements GridListener{
                 }
             });
             headerText=(TextView)findViewById(R.id.header_text);
+            CommonMethod.setFontBold(headerText);
 
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
@@ -131,10 +136,8 @@ public class MovieListActivity extends Activity implements GridListener{
     }
     private void openSearchContainer(){
         LinearLayout searchContainer;
-        EditText searchEditText;
         try{
             searchContainer=(LinearLayout)findViewById(R.id.search_container);
-            searchEditText=(EditText)findViewById(R.id.search_edit);
             if(searchContainer.getVisibility()==View.GONE){
                 searchContainer.setVisibility(View.VISIBLE);
                 searchEditText.requestFocus();
@@ -156,8 +159,11 @@ public class MovieListActivity extends Activity implements GridListener{
         try{
             searchContainer=(LinearLayout)findViewById(R.id.search_container);
             if(searchContainer.getVisibility()==View.VISIBLE){
+                searchEditText.setText("");
+                CommonMethod.hideKeyboard(getBaseContext(),searchContainer);
                 sortTask();
                 searchContainer.setVisibility(View.GONE);
+
             }
 
         }catch (Exception ex){
@@ -190,11 +196,6 @@ public class MovieListActivity extends Activity implements GridListener{
                             movieObject.setPopularity(BigDecimal.valueOf(object.getDouble("popularity")).floatValue());
                             movieObject.setPosterImagePath(object.getString("poster_path"));
                             movieObject.setLanguage(object.getString("original_language"));
-                            /*genreArray=object.getJSONArray("genre_ids");
-                            for(int innerCount=0;innerCount<genreArray.length();innerCount++){
-                                genreIDs.add(genreArray.getInt(innerCount));
-                            }
-                            movieObject.setGenreIds(genreIDs);*/
                             movieObject.setBackDropPath(object.getString("backdrop_path"));
                             movieObject.setForAdult(object.getBoolean("adult"));
                             movieObject.setSummary(object.getString("overview"));
@@ -593,7 +594,6 @@ public class MovieListActivity extends Activity implements GridListener{
                             favouriteText.setText(getString(R.string.remove_favourite));
                             favouriteImage.setImageResource(R.drawable.ic_favorite);
                         }
-                        //morePopUpWindow.dismiss();
                     }catch (Exception ex){
                         Log.e(TAG,ex.toString());
                     }
@@ -615,7 +615,6 @@ public class MovieListActivity extends Activity implements GridListener{
                             watchListText.setText(getString(R.string.remove_watchList));
                             watchListImage.setImageResource(R.drawable.ic_playlist_add);
                         }
-                        //morePopUpWindow.dismiss();
                     }catch (Exception ex){
                         Log.e(TAG,ex.toString());
                     }
@@ -631,10 +630,7 @@ public class MovieListActivity extends Activity implements GridListener{
     @Override
     public void onItemListener(Movie movie) {
         try{
-            if(morePopUpWindow!=null&&morePopUpWindow.isShowing()){
-                morePopUpWindow.dismiss();
-                return;
-            }
+            hideSearchContainer();
             openDetailScreen(movie);
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
@@ -646,6 +642,7 @@ public class MovieListActivity extends Activity implements GridListener{
     @Override
     public void onMoreListener(Movie movie, View view) {
         try{
+            hideSearchContainer();
             showPopup(view,movie);
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
@@ -655,7 +652,7 @@ public class MovieListActivity extends Activity implements GridListener{
         Intent intent;
         try {
             intent = new Intent(getApplicationContext(), FavouriteListActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,FAVOURITE_CODE);
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
         } catch (Exception ex) {
             Log.e(TAG, ex.toString());
@@ -665,7 +662,7 @@ public class MovieListActivity extends Activity implements GridListener{
         Intent intent;
         try {
             intent = new Intent(getApplicationContext(), WatchListActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,WATCHLIST_CODE);
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
         } catch (Exception ex) {
             Log.e(TAG, ex.toString());
@@ -676,7 +673,7 @@ public class MovieListActivity extends Activity implements GridListener{
         try {
             intent = new Intent(getApplicationContext(), MovieDetailScreen.class);
             intent.putExtra("movie",movie);
-            startActivity(intent);
+            startActivityForResult(intent,DETAIL_CODE);
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
         } catch (Exception ex) {
             Log.e(TAG, ex.toString());
@@ -721,5 +718,10 @@ public class MovieListActivity extends Activity implements GridListener{
             Log.e(TAG,ex.toString());
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

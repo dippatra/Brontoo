@@ -94,5 +94,6 @@ public class WatchListActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        overridePendingTransition(R.anim.open_main, R.anim.close_next);
     }
 }
