@@ -402,7 +402,47 @@ public class CommonMethod {
         }
     }
     public static void removeFromWatchList(Context context,int id){
+        String watchList;
+        JSONArray watchListArray;
+        JSONArray newWatchListArray=new JSONArray();
         try{
+            watchList=getWatchMovieList(context);
+            if(!watchList.equalsIgnoreCase("")){
+                watchListArray=new JSONArray(watchList);
+                if(watchListArray!=null&&watchListArray.length()>0){
+                    for(int count=0;count<watchListArray.length();count++){
+                        if(watchListArray.getJSONObject(count).getInt("id")!=id){
+                            newWatchListArray.put(watchListArray.getJSONObject(count));
+                        }
+
+                    }
+                }
+                saveWatchMovieList(context,newWatchListArray.toString());
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+    }
+
+    public static void removeFromFavouriteList(Context context,int id){
+        String favList;
+        JSONArray favListArray;
+        JSONArray newFavListArray=new JSONArray();
+        try{
+            favList=getFavouriteMovieList(context);
+            if(!favList.equalsIgnoreCase("")){
+                favListArray=new JSONArray(favList);
+                if(favListArray!=null&&favListArray.length()>0){
+                    for(int count=0;count<favListArray.length();count++){
+                        if(favListArray.getJSONObject(count).getInt("id")!=id){
+                            newFavListArray.put(favListArray.getJSONObject(count));
+                        }
+
+                    }
+                }
+                saveFavouriteMovieList(context,newFavListArray.toString());
+            }
 
         }catch (Exception ex){
             Log.e(TAG,ex.toString());

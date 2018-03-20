@@ -20,6 +20,10 @@
     <string name="add_watchList">Add to WatchList</string>
     <string name="remove_favourite">Remove from Favourite</string>
     <string name="remove_watchList">Remove from WatchList</string>
+    <string name="favourite_header">Favourite</string>
+    <string name="watchList_header">WatchList</string>
+    <string name="empty_watchList">Watch list is empty.</string>
+    <string name="empty_favouriteList">Favourite list is empty.</string>
 
 
 </resources>

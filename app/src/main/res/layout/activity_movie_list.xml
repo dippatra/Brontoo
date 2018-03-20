@@ -40,6 +40,7 @@
                 android:layout_height="@dimen/header_height"
                 android:layout_alignParentRight="true"
                 android:padding="18dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_search" />
 
             <LinearLayout
@@ -55,6 +56,7 @@
                     android:layout_width="@dimen/header_height"
                     android:layout_height="@dimen/header_height"
                     android:padding="18dp"
+                    android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/ic_arrow_back_blue" />
 
                 <android.support.v7.widget.AppCompatEditText
@@ -142,6 +144,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="15dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_white" />
 
             <TextView
@@ -241,6 +244,7 @@
             android:id="@+id/favourite_container"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/sort_container">
 
             <ImageView
@@ -281,6 +285,7 @@
             android:id="@+id/watchList_container"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_below="@+id/favourite_container">
 
             <ImageView

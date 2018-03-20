@@ -27,13 +27,12 @@ public class MovieRecyclerAdapter extends RecyclerView.Adapter<MovieRecyclerAdap
     private GridListener listener;
 
 
-    public MovieRecyclerAdapter(Context context,ArrayList<Movie>movieList){
+    public MovieRecyclerAdapter(Context context,ArrayList<Movie>movieList,GridListener listener){
         this.context=context;
         this.movieList=movieList;
-    }
-    public void setListener(GridListener listener){
         this.listener=listener;
     }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

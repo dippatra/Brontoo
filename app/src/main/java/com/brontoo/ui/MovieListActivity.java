@@ -2,6 +2,7 @@ package com.brontoo.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -41,7 +42,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 
-public class MovieListActivity extends Activity {
+
+public class MovieListActivity extends Activity implements GridListener{
     private static final String TAG="MovieListActivity";
     private ArrayList<Movie>movieList=new ArrayList<>();
     private MovieRecyclerAdapter movieRecyclerAdapter;
@@ -60,7 +62,6 @@ public class MovieListActivity extends Activity {
             populateMovieList();
             initializeActivityControl();
             initializeRecyclerView();
-            AppConstant.sortedMechanism=2;
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
         }
@@ -155,6 +156,7 @@ public class MovieListActivity extends Activity {
         try{
             searchContainer=(LinearLayout)findViewById(R.id.search_container);
             if(searchContainer.getVisibility()==View.VISIBLE){
+                sortTask();
                 searchContainer.setVisibility(View.GONE);
             }
 
@@ -214,31 +216,13 @@ public class MovieListActivity extends Activity {
     private void initializeRecyclerView(){
         try{
             hideNoSearchResultView();
-            if(movieList!=null&&movieList.size()>0){
-                movieList=CommonMethod.sortByName(movieList);
-            }
-            if(movieList!=null&&movieList.size()>0){
-                movieList=CommonMethod.sortBypopularity(movieList);
-            }
-            if(movieList!=null&&movieList.size()>0){
-                movieList=CommonMethod.sortByDate(movieList);
-            }
             recyclerView=(RecyclerView)findViewById(R.id.recyclerView);
-            movieRecyclerAdapter=new MovieRecyclerAdapter(this,movieList);
+            movieRecyclerAdapter=new MovieRecyclerAdapter(this,movieList,this);
             GridLayoutManager manager = new GridLayoutManager(this, CommonMethod.calculateNoOfColumns(getBaseContext()), GridLayoutManager.VERTICAL, false);
             recyclerView.setAdapter(movieRecyclerAdapter);
             recyclerView.setLayoutManager(manager);
-            movieRecyclerAdapter.setListener(new GridListener() {
-                @Override
-                public void onItemListener(Movie movie) {
-                    Toast.makeText(MovieListActivity.this, "item clicked", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onMoreListener(Movie movie,View view) {
-                    showPopup(view);
-                }
-            });
+            AppConstant.sortedMechanism=2;
+            sortTask();
         }catch (Exception ex){
             Log.e(TAG,ex.toString());
         }
@@ -288,7 +272,7 @@ public class MovieListActivity extends Activity {
     private void updateRecycleView(ArrayList<Movie>movieList){
         try{
             if(recyclerView!=null && movieList!=null&&movieList.size()>0){
-                recyclerView.setAdapter(new MovieRecyclerAdapter(this,movieList));
+                recyclerView.setAdapter(new MovieRecyclerAdapter(this,movieList,this));
                 recyclerView.invalidate();
             }
 
@@ -434,18 +418,33 @@ public class MovieListActivity extends Activity {
             sortText=(TextView)findViewById(R.id.sort_text);
             favouriteText=(TextView)findViewById(R.id.favourite_text);
             watchList=(TextView)findViewById(R.id.watchList_text);
+            CommonMethod.setFontMedium(header);
+            CommonMethod.setFontMedium(sortText);
+            CommonMethod.setFontMedium(favouriteText);
+            CommonMethod.setFontMedium(watchList);
             favouriteContainer=(RelativeLayout)findViewById(R.id.favourite_container);
             favouriteContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(MovieListActivity.this, getString(R.string.wip_message), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MovieListActivity.this, getString(R.string.wip_message), Toast.LENGTH_SHORT).show();
+                    if(!isFavouriteListEmpty()){
+                        openFavouriteLisScreen();
+                    }else {
+                        Toast.makeText(MovieListActivity.this, getString(R.string.empty_favouriteList), Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             });
             WatchlistContainer=(RelativeLayout)findViewById(R.id.watchList_container);
             WatchlistContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(MovieListActivity.this, getString(R.string.wip_message), Toast.LENGTH_SHORT).show();
+                    if(!isWatchListEmpty()){
+                        openWatchLisScreen();
+                    }else {
+                        Toast.makeText(MovieListActivity.this, getString(R.string.empty_watchList), Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             });
             sortGroup=(RadioGroup)findViewById(R.id.radioGroup);
@@ -534,43 +533,176 @@ public class MovieListActivity extends Activity {
 
     }
     private PopupWindow morePopUpWindow;
-    public void showPopup(View v) {
-        LinearLayout favourite,watchList;
-        ImageView favouriteImage,watchListImage;
-        TextView favouriteText,watchListText;
+    public void showPopup(View v, final Movie movie) {
+        try {
+            LinearLayout favourite,watchList;
+            final ImageView favouriteImage,watchListImage;
+            final TextView favouriteText,watchListText;
 
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View popupView = layoutInflater.inflate(R.layout.more_popup_layout, null);
-        morePopUpWindow = new PopupWindow(popupView, CommonMethod.dpToPx(getBaseContext(),200),
-                CommonMethod.dpToPx(getBaseContext(),81));
-        morePopUpWindow.setOutsideTouchable(true);
-        morePopUpWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        morePopUpWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
+            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View popupView = layoutInflater.inflate(R.layout.more_popup_layout, null);
+            morePopUpWindow = new PopupWindow(popupView, CommonMethod.dpToPx(getBaseContext(),200),
+                    CommonMethod.dpToPx(getBaseContext(),81));
+            morePopUpWindow.setOutsideTouchable(true);
+            morePopUpWindow.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            morePopUpWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                @Override
+                public void onDismiss() {
 
+                }
+            });
+            favouriteText=(TextView)popupView.findViewById(R.id.favourite_more_text);
+            CommonMethod.setFontMedium(favouriteText);
+            watchListText=(TextView)popupView.findViewById(R.id.wathchlist_more_text);
+            CommonMethod.setFontMedium(watchListText);
+            favouriteImage=(ImageView)popupView.findViewById(R.id.favourite_image);
+            watchListImage=(ImageView)popupView.findViewById(R.id.watchlist_image);
+            favourite=(LinearLayout)popupView.findViewById(R.id.favourite_container);
+            if(!CommonMethod.isMovieInFavouriteList(getBaseContext(),movie.getID())){
+                favouriteText.setText(getString(R.string.add_favourite));
+                favouriteImage.setImageResource(R.drawable.ic_favorite_unmarkerd);
+
+            }else {
+                favouriteText.setText(getString(R.string.remove_favourite));
+                favouriteImage.setImageResource(R.drawable.ic_favorite);
             }
-        });
-        favouriteText=(TextView)popupView.findViewById(R.id.favourite_more_text);
-        CommonMethod.setFontMedium(favouriteText);
-        watchListText=(TextView)popupView.findViewById(R.id.watchList_text);
-        CommonMethod.setFontMedium(watchListText);
-        favouriteImage=(ImageView)popupView.findViewById(R.id.favourite_image);
-        watchListImage=(ImageView)popupView.findViewById(R.id.watchlist_image);
-        favourite=(LinearLayout)popupView.findViewById(R.id.favourite_container);
-        favourite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            if(!CommonMethod.isMovieInWatchList(getBaseContext(),movie.getID())){
+                watchListText.setText(getString(R.string.add_watchList));
+                watchListImage.setImageResource(R.drawable.ic_playlist_unmarked);
 
+            }else {
+                watchListText.setText(getString(R.string.remove_watchList));
+                watchListImage.setImageResource(R.drawable.ic_playlist_add);
             }
-        });
-        watchList=(LinearLayout)popupView.findViewById(R.id.watchList);
-        watchList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            favourite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try{
+                        if(CommonMethod.isMovieInFavouriteList(getBaseContext(),movie.getID())){
+                            CommonMethod.removeFromFavouriteList(getBaseContext(),movie.getID());
+                            favouriteText.setText(getString(R.string.add_favourite));
+                            favouriteImage.setImageResource(R.drawable.ic_favorite_unmarkerd);
 
+                        }else {
+                            CommonMethod.saveToFavouriteList(getBaseContext(),movie.getID());
+                            favouriteText.setText(getString(R.string.remove_favourite));
+                            favouriteImage.setImageResource(R.drawable.ic_favorite);
+                        }
+                        //morePopUpWindow.dismiss();
+                    }catch (Exception ex){
+                        Log.e(TAG,ex.toString());
+                    }
+
+                }
+            });
+            watchList=(LinearLayout)popupView.findViewById(R.id.watchlist_container);
+            watchList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try{
+                        if(CommonMethod.isMovieInWatchList(getBaseContext(),movie.getID())){
+                            CommonMethod.removeFromWatchList(getBaseContext(),movie.getID());
+                            watchListText.setText(getString(R.string.add_watchList));
+                            watchListImage.setImageResource(R.drawable.ic_playlist_unmarked);
+
+                        }else {
+                            CommonMethod.saveToWatchList(getBaseContext(),movie.getID());
+                            watchListText.setText(getString(R.string.remove_watchList));
+                            watchListImage.setImageResource(R.drawable.ic_playlist_add);
+                        }
+                        //morePopUpWindow.dismiss();
+                    }catch (Exception ex){
+                        Log.e(TAG,ex.toString());
+                    }
+                }
+            });
+            morePopUpWindow.showAsDropDown(v);
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+
+    }
+
+    @Override
+    public void onItemListener(Movie movie) {
+        try{
+            if(morePopUpWindow.isShowing()){
+                morePopUpWindow.dismiss();
+                return;
             }
-        });
-        morePopUpWindow.showAsDropDown(v);
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+
+
+    }
+
+    @Override
+    public void onMoreListener(Movie movie, View view) {
+        try{
+            showPopup(view,movie);
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+    }
+    private void openFavouriteLisScreen() {
+        Intent intent;
+        try {
+            intent = new Intent(getApplicationContext(), FavouriteListActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.toString());
+        }
+    }
+    private void openWatchLisScreen() {
+        Intent intent;
+        try {
+            intent = new Intent(getApplicationContext(), WatchListActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.open_next, R.anim.close_main);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.toString());
+        }
+    }
+    private boolean isFavouriteListEmpty(){
+        String favouriteList="";
+        try{
+            favouriteList=CommonMethod.getFavouriteMovieList(getBaseContext());
+            if(favouriteList.equalsIgnoreCase("")||favouriteList.equalsIgnoreCase("[]")){
+                return true;
+            }else {
+                JSONArray array=new JSONArray(favouriteList);
+                if(array.length()>0){
+                    return false;
+                }else {
+                    return true;
+                }
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return true;
+    }
+    private boolean isWatchListEmpty(){
+        String list="";
+        try{
+            list=CommonMethod.getWatchMovieList(getBaseContext());
+            if(list.equalsIgnoreCase("")||list.equalsIgnoreCase("[]")){
+                return true;
+            }else {
+                JSONArray array=new JSONArray(list);
+                if(array.length()>0){
+                    return false;
+                }else {
+                    return true;
+                }
+            }
+
+        }catch (Exception ex){
+            Log.e(TAG,ex.toString());
+        }
+        return true;
     }
 }
