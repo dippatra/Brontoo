@@ -273,6 +273,7 @@ public class MovieListActivity extends Activity implements GridListener{
     private void updateRecycleView(ArrayList<Movie>movieList){
         try{
             if(recyclerView!=null && movieList!=null&&movieList.size()>0){
+                showRecyclerView();
                 recyclerView.setAdapter(new MovieRecyclerAdapter(this,movieList,this));
                 recyclerView.invalidate();
             }
@@ -324,7 +325,6 @@ public class MovieListActivity extends Activity implements GridListener{
                     hideProgressBar();
                     if(movies!=null&&movies.size()>0){
                         hideNoSearchResultView();
-                        showRecyclerView();
                         updateRecycleView(movies);
                     }else {
                         hideRecyclerView();
