@@ -28,6 +28,7 @@ public class SplashScreen extends Activity {
     private RequestQueue mRequestQueue;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +47,24 @@ public class SplashScreen extends Activity {
     private void initializeActivityControl() {
         try {
             mRequestQueue = Volley.newRequestQueue(this);
-            if (CommonMethod.isOnline(getBaseContext())) {
+            if(CommonMethod.getMovieList(getBaseContext()).equalsIgnoreCase("")){// first time install.
+                if (CommonMethod.isOnline(getBaseContext())) {
+                    fetchData();
+                }else {
+                    showNoInternetDialog(false);
+                }
+            }else {
+                if (CommonMethod.isOnline(getBaseContext())) {
+                    fetchData();
+                }else {
+                    showNoInternetDialog(true);
+                }
+            }
+            /*if (CommonMethod.isOnline(getBaseContext())) {
                 fetchData();
             }else {
                 showNoInternetDialog();
-            }
+            }*/
 
         } catch (Exception ex) {
             Log.e(TAG, ex.toString());
@@ -117,15 +131,20 @@ public class SplashScreen extends Activity {
             intent = new Intent(getApplicationContext(), MovieListActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.open_next, R.anim.close_main);
+            finish();
         } catch (Exception ex) {
             Log.e(TAG, ex.toString());
         }
     }
 
-    private void showNoInternetDialog(){
+    private void showNoInternetDialog(boolean showContinue){
         try{
             AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.MyDialogStyle);
-            builder.setMessage(getString(R.string.no_internet_message));
+            if(showContinue){
+                builder.setMessage(getString(R.string.no_internet_message));
+            }else {
+                builder.setMessage(getString(R.string.no_internet_message_first_time));
+            }
             builder.setCancelable(false);
             builder.setNegativeButton(
                     getString(R.string.exit_text),
@@ -135,6 +154,14 @@ public class SplashScreen extends Activity {
                             finishAffinity();
                         }
                     });
+            if(showContinue){
+                builder.setPositiveButton(getString(R.string.continue_text),new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        openMovieLisScreen();
+                    }
+                });
+            }
+
 
             AlertDialog alert = builder.create();
             alert.show();

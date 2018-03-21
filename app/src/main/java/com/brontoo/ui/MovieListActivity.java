@@ -419,7 +419,7 @@ public class MovieListActivity extends Activity implements GridListener{
             sortText=(TextView)findViewById(R.id.sort_text);
             favouriteText=(TextView)findViewById(R.id.favourite_text);
             watchList=(TextView)findViewById(R.id.watchList_text);
-            CommonMethod.setFontMedium(header);
+            CommonMethod.setFontBold(header);
             CommonMethod.setFontMedium(sortText);
             CommonMethod.setFontMedium(favouriteText);
             CommonMethod.setFontMedium(watchList);
